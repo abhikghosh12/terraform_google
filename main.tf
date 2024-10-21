@@ -22,6 +22,8 @@ module "voice_app" {
   cluster_endpoint        = module.gke.cluster_endpoint
   cluster_ca_certificate = module.gke.cluster_ca_certificate
   google_client_access_token = data.google_client_config.default.access_token
+
+  depends_on = [module.gke]
 }
 
 
