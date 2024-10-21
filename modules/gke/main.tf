@@ -1,6 +1,13 @@
 # modules/gke/main.tf
 
+variable "create_cluster" {
+  description = "Whether to create the GKE cluster"
+  type        = bool
+  default     = true
+}
+
 resource "google_container_cluster" "primary" {
+  count    = var.create_cluster ? 1 : 0
   name     = var.cluster_name
   location = var.region
 
@@ -11,15 +18,16 @@ resource "google_container_cluster" "primary" {
   ip_allocation_policy {}
 
   lifecycle {
-    ignore_changes  = [name]
     prevent_destroy = true
+    ignore_changes  = [name]
   }
 }
 
 resource "google_container_node_pool" "primary_nodes" {
+  count      = var.create_cluster ? 1 : 0
   name       = "${var.cluster_name}-node-pool"
   location   = var.region
-  cluster    = google_container_cluster.primary.name
+  cluster    = google_container_cluster.primary[0].name
   node_count = var.node_count
 
   node_config {
@@ -30,8 +38,13 @@ resource "google_container_node_pool" "primary_nodes" {
       "https://www.googleapis.com/auth/monitoring",
       "https://www.googleapis.com/auth/devstorage.read_only",
     ]
-
-    disk_type    = "pd-standard" # Changed from SSD to standard persistent disk
-    disk_size_gb = 50            # Reduced disk size
   }
+}
+
+output "cluster_endpoint" {
+  value = var.create_cluster ? google_container_cluster.primary[0].endpoint : ""
+}
+
+output "cluster_ca_certificate" {
+  value = var.create_cluster ? google_container_cluster.primary[0].master_auth[0].cluster_ca_certificate : ""
 }
