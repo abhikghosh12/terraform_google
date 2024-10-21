@@ -6,12 +6,6 @@ variable "project_id" {
   default     = "voice-439010"
 }
 
-variable "region" {
-  description = "GCP region"
-  type        = string
-  default     = "us-central1"
-}
-
 variable "cluster_name" {
   description = "Name of the GKE cluster"
   type        = string
@@ -65,4 +59,10 @@ variable "chart_path" {
   description = "Path to the Helm chart"
   type        = string
   default     = "./Charts/voice-app-0.1.0.tgz"
+}
+
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "europe-west10-a"  # Replace with your desired region
 }

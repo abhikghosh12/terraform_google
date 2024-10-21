@@ -9,6 +9,11 @@ resource "google_container_cluster" "primary" {
 
   networking_mode = "VPC_NATIVE"
   ip_allocation_policy {}
+
+  lifecycle {
+    ignore_changes = [name]
+    prevent_destroy = true
+  }
 }
 
 resource "google_container_node_pool" "primary_nodes" {
