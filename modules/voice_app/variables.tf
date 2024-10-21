@@ -55,3 +55,8 @@ variable "cluster_ca_certificate" {
   type        = string
   sensitive   = true
 }
+ variable "google_client_access_token" {
+  description = "Access token from the Google client configuration"
+  type        = string
+  sensitive   = true 
+}

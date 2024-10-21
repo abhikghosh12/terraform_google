@@ -21,6 +21,8 @@ module "voice_app" {
   domain_name  = var.domain_name
   cluster_endpoint        = module.gke.cluster_endpoint
   cluster_ca_certificate = module.gke.cluster_ca_certificate
+  google_client_access_token = data.google_client_config.default.access_token
 }
+
 
 data "google_client_config" "default" {}
