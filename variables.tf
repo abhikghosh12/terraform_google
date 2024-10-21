@@ -42,11 +42,6 @@ variable "release_name" {
   default     = "voice-app"
 }
 
-variable "chart_path" {
-  description = "Path to the Helm chart"
-  type        = string
-  default     = "./charts/voice-app"
-}
 
 variable "webapp_image" {
   description = "Docker image for the webapp"
@@ -63,5 +58,11 @@ variable "worker_image" {
 variable "domain_name" {
   description = "Domain name for the application"
   type        = string
-  default     = "voiceapp.example.com"
+  default     = "voicesapp.net"
+}
+
+variable "chart_path" {
+  description = "Path to the Helm chart"
+  type        = string
+  default     = "./Charts/voice-app-0.1.0.tgz"
 }
