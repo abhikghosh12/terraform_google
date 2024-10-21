@@ -1,17 +1,4 @@
 # modules/gke/main.tf
-
-variable "create_cluster" {
-  description = "Whether to create the GKE cluster"
-  type        = bool
-  default     = true
-}
-
-variable "disk_size_gb" {
-  description = "Size of the disk attached to each node, specified in GB"
-  type        = number
-  default     = 25  # Changed to 25GB
-}
-
 resource "google_container_cluster" "primary" {
   count    = var.create_cluster ? 1 : 0
   name     = var.cluster_name
