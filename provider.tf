@@ -18,7 +18,6 @@ terraform {
 }
 
 # backend.tf
-
 terraform {
   backend "gcs" {
     bucket  = "terraform_state_files_voice"

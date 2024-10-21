@@ -39,6 +39,10 @@ jobs:
 
     - name: Terraform Validate
       run: terraform validate -no-color
+
+    - name: Import Existing GKE Cluster
+    run: terraform import module.gke.google_container_cluster.primary projects/voice-439010/locations/europe-west4/clusters/voice-app-cluster
+    continue-on-error: true   
       
     # - name: Terraform import
     #   run: |        
