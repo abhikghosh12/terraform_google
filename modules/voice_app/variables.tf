@@ -59,28 +59,3 @@ variable "cluster_ca_certificate" {
   description = "GKE cluster CA certificate"
   type        = string
 }
-
-variable "worker_image" {
-  description = "Docker image for the worker"
-  type        = string
-}
-
-variable "domain_name" {
-  description = "Domain name for the application"
-  type        = string
-}
-
-variable "google_client_access_token" {
-  description = "Google client access token"
-  type        = string
-}
-
-variable "cluster_endpoint" {
-  description = "GKE cluster endpoint"
-  type        = string
-}
-
-variable "cluster_ca_certificate" {
-  description = "GKE cluster CA certificate"
-  type        = string
-}
