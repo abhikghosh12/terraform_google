@@ -45,18 +45,17 @@ variable "domain_name" {
   type        = string
 }
 
+variable "google_client_access_token" {
+  description = "Google client access token"
+  type        = string
+}
+
 variable "cluster_endpoint" {
-  description = "Endpoint for the GKE cluster"
+  description = "GKE cluster endpoint"
   type        = string
 }
 
 variable "cluster_ca_certificate" {
-  description = "CA certificate for the GKE cluster"
+  description = "GKE cluster CA certificate"
   type        = string
-  sensitive   = true
-}
- variable "google_client_access_token" {
-  description = "Access token from the Google client configuration"
-  type        = string
-  sensitive   = true 
 }
