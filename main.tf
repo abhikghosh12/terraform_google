@@ -1,7 +1,4 @@
 # main.tf
-
-data "google_client_config" "default" {}
-
 locals {
   cluster_exists = try(data.google_container_cluster.existing_cluster[0].id, "") != ""
 }
