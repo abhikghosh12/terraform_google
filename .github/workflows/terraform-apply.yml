@@ -8,56 +8,59 @@ on:
     branches:
     - main
 
-env:
-  TF_VERSION: '1.0.0'
-  TF_WORKING_DIR: '.'
-
 jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: ${{ env.TF_VERSION }}
-
-    - name: Setup Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.2.1
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
+        terraform_version: 1.0.0
 
     - name: Terraform Format
+      id: fmt
       run: terraform fmt -check
-      working-directory: ${{ env.TF_WORKING_DIR }}
+      continue-on-error: true
+
+    - name: Terraform Format Fixer
+      if: steps.fmt.outcome == 'failure'
+      run: |
+        terraform fmt
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -am "Automated Terraform formatting" || echo "No changes to commit"
+        git push
 
     - name: Terraform Init
       run: terraform init
-      working-directory: ${{ env.TF_WORKING_DIR }}
 
     - name: Terraform Validate
       run: terraform validate -no-color
-      working-directory: ${{ env.TF_WORKING_DIR }}
 
     - name: Terraform Plan
-      run: terraform plan -no-color
-      working-directory: ${{ env.TF_WORKING_DIR }}
-      env:
-        TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
-        TF_VAR_region: ${{ secrets.GCP_REGION }}
-        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+      run: terraform plan -no-color -out=tfplan
+      continue-on-error: true
+
+    - name: Upload Terraform Plan
+      uses: actions/upload-artifact@v3
+      with:
+        name: tfplan
+        path: tfplan
+
+    - name: Terraform Show
+      run: terraform show -no-color tfplan > tfplan.txt
+
+    - name: Upload Terraform Plan Text
+      uses: actions/upload-artifact@v3
+      with:
+        name: tfplan-text
+        path: tfplan.txt
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -no-color
-      working-directory: ${{ env.TF_WORKING_DIR }}
-      env:
-        TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
-        TF_VAR_region: ${{ secrets.GCP_REGION }}
-        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+      run: terraform apply -auto-approve tfplan
