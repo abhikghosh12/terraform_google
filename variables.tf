@@ -65,5 +65,5 @@ variable "region" {
   description = "GCP region"
   type        = string
   default     = "europe-west10-a"
-  
+
 }
