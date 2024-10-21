@@ -28,8 +28,6 @@ provider "google" {
   region  = var.region
 }
 
-data "google_client_config" "default" {}
-
 
 provider "kubernetes" {
   host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
