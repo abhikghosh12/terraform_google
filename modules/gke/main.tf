@@ -11,7 +11,7 @@ resource "google_container_cluster" "primary" {
   ip_allocation_policy {}
 
   lifecycle {
-    ignore_changes = [name]
+    ignore_changes  = [name]
     prevent_destroy = true
   }
 }
@@ -31,7 +31,7 @@ resource "google_container_node_pool" "primary_nodes" {
       "https://www.googleapis.com/auth/devstorage.read_only",
     ]
 
-    disk_type    = "pd-standard"  # Changed from SSD to standard persistent disk
-    disk_size_gb = 50  # Reduced disk size
+    disk_type    = "pd-standard" # Changed from SSD to standard persistent disk
+    disk_size_gb = 50            # Reduced disk size
   }
 }

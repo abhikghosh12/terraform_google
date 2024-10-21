@@ -7,9 +7,9 @@ resource "kubernetes_namespace" "voice_app" {
 }
 
 resource "helm_release" "voice_app" {
-  name       = var.release_name
-  chart      = var.chart_path
-  namespace  = kubernetes_namespace.voice_app.metadata[0].name
+  name      = var.release_name
+  chart     = var.chart_path
+  namespace = kubernetes_namespace.voice_app.metadata[0].name
 
   set {
     name  = "worker.image.repository"
@@ -47,7 +47,7 @@ resource "google_compute_address" "voice_app" {
   region = var.region
 
   lifecycle {
-    ignore_changes = [name]
+    ignore_changes  = [name]
     prevent_destroy = true
   }
 }

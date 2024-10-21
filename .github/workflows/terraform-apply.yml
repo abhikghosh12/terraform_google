@@ -40,8 +40,9 @@ jobs:
     # - name: Terraform Validate
     #   run: terraform validate -no-color
 
-    # - name: Import Existing GKE Cluster
-    #   run: |
+    - name: Import Existing GKE Cluster
+      run: |
+          terraform state list
     #     terraform import module.gke.google_container_cluster.primary projects/voice-439010/locations/europe-west4/clusters/voice-app-cluster
     #     terraform import module.voice_app.google_compute_address.voice_app projects/voice-439010/regions/europe-west4/addresses/voice-app-ip
     #   continue-on-error: true
@@ -49,10 +50,10 @@ jobs:
     - name: Terraform Plan
       run: terraform plan -no-color -out=tfplan
 
-    # - name: Terraform Apply
-    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    #   run: terraform apply -auto-approve tfplan
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve tfplan
 
-    - name: Terraform Destroy
-      run: |
-        terraform  destroy -auto-approve      
+    # - name: Terraform Destroy
+    #   run: |
+    #     terraform  destroy -auto-approve      
