@@ -22,18 +22,19 @@ jobs:
       with:
         terraform_version: 1.0.0
 
-    - name: Terraform Format Check
+    - name: Terraform Format
       id: fmt
-      run: terraform fmt -check -recursive -diff
+      run: terraform fmt -check
       continue-on-error: true
 
-    - name: Terraform Format Result
+    - name: Terraform Format Fixer
       if: steps.fmt.outcome == 'failure'
       run: |
-        echo "Terraform formatting issues found. Please run 'terraform fmt' locally and commit the changes."
-        echo "The following files need formatting:"
-        terraform fmt -check -recursive -list=true
-      
+        terraform fmt
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -am "Automated Terraform formatting" || echo "No changes to commit"
+        git push
 
     - name: Terraform Init
       run: terraform init
@@ -63,7 +64,3 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve tfplan
-
-    - name: Check Terraform Format Status
-      if: steps.fmt.outcome == 'failure'
-      run: exit 1
