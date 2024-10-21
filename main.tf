@@ -1,4 +1,7 @@
 # main.tf
+
+data "google_client_config" "default" {}
+
 module "gke" {
   source       = "./modules/gke"
   project_id   = var.project_id
@@ -19,28 +22,6 @@ module "voice_app" {
   webapp_image = var.webapp_image
   worker_image = var.worker_image
   domain_name  = var.domain_name
-  cluster_endpoint        = module.gke.cluster_endpoint
-  cluster_ca_certificate = module.gke.cluster_ca_certificate
-  google_client_access_token = data.google_client_config.default.access_token
 
-  depends_on = [module.gke] 
-}
-
-
-data "google_client_config" "default" {}
-
-
-provider "kubernetes" {
-  host                   = "https://${module.gke.cluster_endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.gke.cluster_ca_certificate)
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = "https://${module.gke.cluster_endpoint}"
-    token                  = data.google_client_config.default.access_token
-    cluster_ca_certificate = base64decode(module.gke.cluster_ca_certificate)
-  }
-
+  depends_on = [module.gke]
 }

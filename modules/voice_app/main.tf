@@ -52,7 +52,6 @@ resource "google_compute_address" "voice_app" {
   }
 }
 
-
 resource "kubernetes_ingress_v1" "voice_app" {
   metadata {
     name      = "voice-app-ingress"
