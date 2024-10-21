@@ -17,6 +17,14 @@ terraform {
   }
 }
 
+# backend.tf
+
+terraform {
+  backend "gcs" {
+    bucket  = "terraform_state_files_voice"
+    prefix  = "terraform/state"
+  }
+}
 provider "google" {
   project = var.project_id
   region  = var.region
