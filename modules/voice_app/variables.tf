@@ -44,3 +44,14 @@ variable "domain_name" {
   description = "Domain name for the application"
   type        = string
 }
+
+variable "cluster_endpoint" {
+  description = "Endpoint for the GKE cluster"
+  type        = string
+}
+
+variable "cluster_ca_certificate" {
+  description = "CA certificate for the GKE cluster"
+  type        = string
+  sensitive   = true
+}

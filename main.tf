@@ -19,6 +19,8 @@ module "voice_app" {
   webapp_image = var.webapp_image
   worker_image = var.worker_image
   domain_name  = var.domain_name
+  cluster_endpoint        = module.gke.cluster_endpoint
+  cluster_ca_certificate = module.gke.cluster_ca_certificate
 }
 
 data "google_client_config" "default" {}
