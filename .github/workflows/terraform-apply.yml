@@ -39,6 +39,22 @@ jobs:
 
     - name: Terraform Validate
       run: terraform validate -no-color
+      
+    - name: Terraform import
+      run: |        
+        terraform state list
+        terraform import module.gke.google_container_cluster.primary projects/voice-439010/locations/europe-west4/clusters/voice-app-cluster
+        terraform import module.voice_app.google_compute_address.voice_app projects/voice-439010/regions/europe-west4/addresses/voice-app-ip
+    #     terraform state rm 'module.k8s_resources.kubernetes_namespace.voice_app'
+    #     terraform state rm 'module.k8s_resources.kubernetes_persistent_volume.voice_app_pvs["redis-master"]'
+    #     terraform state rm 'module.k8s_resources.kubernetes_persistent_volume.voice_app_pvs["redis-replicas"]'
+    #     terraform state rm 'module.k8s_resources.kubernetes_persistent_volume.voice_app_pvs["voice-app-output"]'
+    #     terraform state rm 'module.k8s_resources.kubernetes_persistent_volume.voice_app_pvs["voice-app-uploads"]'
+  
+    #     terraform state rm 'module.voice_app.kubernetes_persistent_volume_claim.voice_app_uploads'
+    #     terraform state rm 'module.voice_app.kubernetes_persistent_volume_claim.voice_app_output'
+    #     terraform state rm 'module.voice_app.kubernetes_persistent_volume_claim.redis_master'
+    #     terraform state rm 'module.voice_app.kubernetes_persistent_volume_claim.redis_replicas'
 
     - name: Terraform Plan
       run: terraform plan -no-color -out=tfplan
