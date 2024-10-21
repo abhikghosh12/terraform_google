@@ -2,10 +2,12 @@
 
 data "google_client_config" "default" {}
 
-data "google_container_clusters" "all_clusters" {
+data "google_container_cluster" "all_clusters" {
   project  = var.project_id
   location = var.region
+  
 }
+
 
 locals {
   cluster_exists = contains(data.google_container_clusters.all_clusters.names, var.cluster_name)
