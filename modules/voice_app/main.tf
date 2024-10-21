@@ -45,7 +45,13 @@ resource "helm_release" "voice_app" {
 resource "google_compute_address" "voice_app" {
   name   = "voice-app-ip"
   region = var.region
+
+  lifecycle {
+    ignore_changes = [name]
+    prevent_destroy = true
+  }
 }
+
 
 resource "kubernetes_ingress_v1" "voice_app" {
   metadata {
