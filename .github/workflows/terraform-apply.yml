@@ -23,18 +23,8 @@ jobs:
         terraform_version: 1.0.0
 
     - name: Terraform Format
-      id: fmt
-      run: terraform fmt -check
+      run: terraform fmt -check -recursive
       continue-on-error: true
-
-    - name: Terraform Format Fixer
-      if: steps.fmt.outcome == 'failure'
-      run: |
-        terraform fmt
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git commit -am "Automated Terraform formatting" || echo "No changes to commit"
-        git push
 
     - name: Terraform Init
       run: terraform init
@@ -44,22 +34,9 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan -no-color -out=tfplan
-      continue-on-error: true
 
-    - name: Upload Terraform Plan
-      uses: actions/upload-artifact@v3
-      with:
-        name: tfplan
-        path: tfplan
-
-    - name: Terraform Show
-      run: terraform show -no-color tfplan > tfplan.txt
-
-    - name: Upload Terraform Plan Text
-      uses: actions/upload-artifact@v3
-      with:
-        name: tfplan-text
-        path: tfplan.txt
+    - name: Show Terraform Plan
+      run: terraform show -no-color tfplan
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
