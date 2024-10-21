@@ -40,11 +40,3 @@ resource "google_container_node_pool" "primary_nodes" {
     ]
   }
 }
-
-output "cluster_endpoint" {
-  value = var.create_cluster ? google_container_cluster.primary[0].endpoint : ""
-}
-
-output "cluster_ca_certificate" {
-  value = var.create_cluster ? google_container_cluster.primary[0].master_auth[0].cluster_ca_certificate : ""
-}
