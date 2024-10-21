@@ -42,7 +42,6 @@ jobs:
       
     - name: Terraform import
       run: |        
-        terraform state list
         terraform import module.gke.google_container_cluster.primary projects/voice-439010/locations/europe-west4/clusters/voice-app-cluster
         terraform import module.voice_app.google_compute_address.voice_app projects/voice-439010/regions/europe-west4/addresses/voice-app-ip
     #     terraform state rm 'module.k8s_resources.kubernetes_namespace.voice_app'
