@@ -64,5 +64,6 @@ variable "chart_path" {
 variable "region" {
   description = "GCP region"
   type        = string
-  default     = "europe-west10-a"  # Replace with your desired region
+  default     = "europe-west10-a"
+  
 }
