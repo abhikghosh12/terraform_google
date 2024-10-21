@@ -68,3 +68,9 @@ variable "worker_image" {
   type        = string
   default     = "docker.io/abhikgho/text_to_speech_web_app:worker-v1.0.3"
 }
+
+variable "disk_size_gb" {
+  description = "Size of the disk attached to each node, specified in GB"
+  type        = number
+  default     = 25  # Changed to 25GB
+}
