@@ -12,7 +12,6 @@ resource "google_container_cluster" "primary" {
 
   lifecycle {
     ignore_changes  = [name]
-    prevent_destroy = true
   }
 }
 
