@@ -36,19 +36,6 @@ variable "release_name" {
   default     = "voice-app"
 }
 
-
-variable "webapp_image" {
-  description = "Docker image for the webapp"
-  type        = string
-  default     = "docker.io/abhikgho/text_to_speech_web_app:web-v1.0.3"
-}
-
-variable "worker_image" {
-  description = "Docker image for the worker"
-  type        = string
-  default     = "docker.io/abhikgho/text_to_speech_web_app:worker-v1.0.3"
-}
-
 variable "domain_name" {
   description = "Domain name for the application"
   type        = string
@@ -66,4 +53,18 @@ variable "region" {
   type        = string
   default     = "europe-west4"
 
+}
+
+# variables.tf
+
+variable "webapp_image" {
+  description = "Docker image for the webapp"
+  type        = string
+  default     = "docker.io/abhikgho/text_to_speech_web_app:web-v1.0.3"
+}
+
+variable "worker_image" {
+  description = "Docker image for the worker"
+  type        = string
+  default     = "docker.io/abhikgho/text_to_speech_web_app:worker-v1.0.3"
 }

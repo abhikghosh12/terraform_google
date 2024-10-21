@@ -7,18 +7,28 @@ resource "kubernetes_namespace" "voice_app" {
 }
 
 resource "helm_release" "voice_app" {
-  name      = var.release_name
-  chart     = var.chart_path
-  namespace = kubernetes_namespace.voice_app.metadata[0].name
+  name       = var.release_name
+  chart      = var.chart_path
+  namespace  = kubernetes_namespace.voice_app.metadata[0].name
 
   set {
-    name  = "webapp.image"
-    value = var.webapp_image
+    name  = "worker.image.repository"
+    value = split(":", var.worker_image)[0]
   }
 
   set {
-    name  = "worker.image"
-    value = var.worker_image
+    name  = "worker.image.tag"
+    value = split(":", var.worker_image)[1]
+  }
+
+  set {
+    name  = "webapp.image.repository"
+    value = split(":", var.webapp_image)[0]
+  }
+
+  set {
+    name  = "webapp.image.tag"
+    value = split(":", var.webapp_image)[1]
   }
 
   set {
