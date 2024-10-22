@@ -1,13 +1,16 @@
 # modules/gke/main.tf
+
+
+
 resource "google_container_cluster" "primary" {
   count                    = var.create_cluster ? 1 : 0
   name                     = var.cluster_name
   location                 = var.region
   remove_default_node_pool = true
   initial_node_count       = 1
-  networking_mode          = "VPC_NATIVE"
-  ip_allocation_policy     {}
-  min_master_version       = var.kubernetes_version
+
+  networking_mode = "VPC_NATIVE"
+  ip_allocation_policy {}
 
   lifecycle {
     prevent_destroy = true
@@ -21,7 +24,6 @@ resource "google_container_node_pool" "primary_nodes" {
   location   = var.region
   cluster    = google_container_cluster.primary[0].name
   node_count = var.node_count
-  version    = var.kubernetes_version
 
   node_config {
     machine_type = var.machine_type
@@ -43,4 +45,3 @@ data "google_container_cluster" "primary" {
 
   depends_on = [google_container_cluster.primary]
 }
-
