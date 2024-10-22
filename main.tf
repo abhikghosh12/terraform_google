@@ -1,7 +1,4 @@
 # main.tf
-
-data "google_client_config" "default" {}
-
 module "gke" {
   source       = "./modules/gke"
   project_id   = var.project_id
