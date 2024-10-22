@@ -6,7 +6,7 @@ resource "kubernetes_namespace" "voice_app" {
   }
 }
 
-# PVC for uploads using standard storage class
+# PVC for uploads
 resource "kubernetes_persistent_volume_claim" "voice_app_uploads" {
   metadata {
     name      = "voice-app-uploads"
@@ -14,7 +14,7 @@ resource "kubernetes_persistent_volume_claim" "voice_app_uploads" {
   }
   spec {
     access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard"  # Changed to standard like Redis
+    storage_class_name = "standard"
     resources {
       requests = {
         storage = var.uploads_storage_size
@@ -23,7 +23,7 @@ resource "kubernetes_persistent_volume_claim" "voice_app_uploads" {
   }
 }
 
-# PVC for output using standard storage class
+# PVC for output
 resource "kubernetes_persistent_volume_claim" "voice_app_output" {
   metadata {
     name      = "voice-app-output"
@@ -31,7 +31,7 @@ resource "kubernetes_persistent_volume_claim" "voice_app_output" {
   }
   spec {
     access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard"  # Changed to standard like Redis
+    storage_class_name = "standard"
     resources {
       requests = {
         storage = var.output_storage_size
@@ -40,16 +40,47 @@ resource "kubernetes_persistent_volume_claim" "voice_app_output" {
   }
 }
 
-# Redis PVCs remain the same...
+# PVC for Redis master
+resource "kubernetes_persistent_volume_claim" "redis_master" {
+  metadata {
+    name      = "redis-master"
+    namespace = var.namespace
+  }
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    storage_class_name = "standard"
+    resources {
+      requests = {
+        storage = var.redis_master_storage_size
+      }
+    }
+  }
+}
+
+# PVC for Redis replicas
+resource "kubernetes_persistent_volume_claim" "redis_replicas" {
+  metadata {
+    name      = "redis-replicas"
+    namespace = var.namespace
+  }
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    storage_class_name = "standard"
+    resources {
+      requests = {
+        storage = var.redis_replicas_storage_size
+      }
+    }
+  }
+}
 
 resource "helm_release" "voice_app" {
   name       = var.release_name
   chart      = var.chart_path
   namespace  = kubernetes_namespace.voice_app.metadata[0].name
   version    = var.chart_version
-  timeout    = 900  # Increased timeout
+  timeout    = 900
 
-  # Add a wait for PVCs to be bound
   wait       = true
   wait_for_jobs = true
 
@@ -110,17 +141,6 @@ resource "helm_release" "voice_app" {
   set {
     name  = "redis.replica.persistence.existingClaim"
     value = kubernetes_persistent_volume_claim.redis_replicas.metadata[0].name
-  }
-
-  # Application configuration
-  set {
-    name  = "webapp.replicaCount"
-    value = var.webapp_replica_count
-  }
-
-  set {
-    name  = "worker.replicaCount"
-    value = var.worker_replica_count
   }
 
   # Ingress configuration

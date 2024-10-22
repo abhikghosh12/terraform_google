@@ -29,8 +29,6 @@ worker:
 ingress:
   enabled: ${ingress_enabled}
   host: ${ingress_host}
-  annotations:
-    kubernetes.io/ingress.class: gce
 
 service:
   type: ClusterIP
