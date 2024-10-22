@@ -6,84 +6,108 @@ resource "kubernetes_namespace" "voice_app" {
   }
 }
 
-# Create PVCs using default storage class
-resource "kubernetes_persistent_volume_claim" "app_data" {
+# PVC for uploads
+resource "kubernetes_persistent_volume_claim" "voice_app_uploads" {
   metadata {
-    name      = "voice-app-data"
-    namespace = kubernetes_namespace.voice_app.metadata[0].name
+    name      = "voice-app-uploads"
+    namespace = var.namespace
   }
   spec {
-    access_modes = ["ReadWriteMany"]
+    access_modes = ["ReadWriteOnce"]  # Using RWO as we're using standard-rwo
     resources {
       requests = {
-        storage = "5Gi"
+        storage = var.uploads_storage_size
       }
     }
-  }
-  wait_until_bound = true
-  timeouts {
-    create = "10m"
+    # Using default storage class (standard-rwo)
   }
 }
 
-resource "kubernetes_persistent_volume_claim" "redis_data" {
+# PVC for output
+resource "kubernetes_persistent_volume_claim" "voice_app_output" {
   metadata {
-    name      = "redis-data"
-    namespace = kubernetes_namespace.voice_app.metadata[0].name
+    name      = "voice-app-output"
+    namespace = var.namespace
   }
   spec {
-    access_modes = ["ReadWriteMany"]
+    access_modes = ["ReadWriteOnce"]
     resources {
       requests = {
-        storage = "5Gi"
+        storage = var.output_storage_size
+      }
+    }
+    # Using default storage class (standard-rwo)
+  }
+}
+
+# PVC for Redis master
+resource "kubernetes_persistent_volume_claim" "redis_master" {
+  metadata {
+    name      = "redis-master"
+    namespace = var.namespace
+  }
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    storage_class_name = "standard" # Using standard for Redis (immediate binding)
+    resources {
+      requests = {
+        storage = var.redis_master_storage_size
       }
     }
   }
-  wait_until_bound = true
-  timeouts {
-    create = "10m"
+}
+
+# PVC for Redis replicas
+resource "kubernetes_persistent_volume_claim" "redis_replicas" {
+  metadata {
+    name      = "redis-replicas"
+    namespace = var.namespace
+  }
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    storage_class_name = "standard" # Using standard for Redis (immediate binding)
+    resources {
+      requests = {
+        storage = var.redis_replicas_storage_size
+      }
+    }
   }
 }
 
 resource "helm_release" "voice_app" {
-  name          = var.release_name
-  chart         = var.chart_path
-  namespace     = kubernetes_namespace.voice_app.metadata[0].name
-  force_update  = true
-  replace       = true
-  max_history   = 5
-  timeout       = 1200
+  name      = var.release_name
+  chart     = var.chart_path
+  namespace = var.namespace
+  version   = var.chart_version
 
-  set {
-    name  = "worker.image.repository"
-    value = split(":", var.worker_image)[0]
-  }
+  values = [
+    templatefile("${path.module}/templates/voice_app_values.yaml.tpl", {
+      webapp_image_tag     = var.webapp_image_tag
+      worker_image_tag     = var.worker_image_tag
+      webapp_replica_count = var.webapp_replica_count
+      worker_replica_count = var.worker_replica_count
+      ingress_enabled      = var.ingress_enabled
+      ingress_host         = var.ingress_host
+    })
+  ]
 
-  set {
-    name  = "worker.image.tag"
-    value = split(":", var.worker_image)[1]
-  }
-
-  set {
-    name  = "webapp.image.repository"
-    value = split(":", var.webapp_image)[0]
-  }
-
-  set {
-    name  = "webapp.image.tag"
-    value = split(":", var.webapp_image)[1]
-  }
-
+  # Persistence configuration
   set {
     name  = "persistence.enabled"
     value = "true"
   }
 
   set {
-    name  = "persistence.existingClaim"
-    value = kubernetes_persistent_volume_claim.app_data.metadata[0].name
+    name  = "persistence.uploads.existingClaim"
+    value = kubernetes_persistent_volume_claim.voice_app_uploads.metadata[0].name
   }
 
+  set {
+    name  = "persistence.output.existingClaim"
+    value = kubernetes_persistent_volume_claim.voice_app_output.metadata[0].name
+  }
+
+  # Redis configuration
   set {
     name  = "redis.master.persistence.enabled"
     value = "true"
@@ -91,12 +115,23 @@ resource "helm_release" "voice_app" {
 
   set {
     name  = "redis.master.persistence.existingClaim"
-    value = kubernetes_persistent_volume_claim.redis_data.metadata[0].name
+    value = kubernetes_persistent_volume_claim.redis_master.metadata[0].name
   }
 
   set {
-    name  = "ingress.enabled"
+    name  = "redis.replica.persistence.enabled"
     value = "true"
+  }
+
+  set {
+    name  = "redis.replica.persistence.existingClaim"
+    value = kubernetes_persistent_volume_claim.redis_replicas.metadata[0].name
+  }
+
+  # Ingress configuration
+  set {
+    name  = "ingress.enabled"
+    value = var.ingress_enabled
   }
 
   set {
@@ -110,22 +145,19 @@ resource "helm_release" "voice_app" {
   }
 
   set {
-    name  = "ingress.hosts[0].host"
-    value = var.domain_name
+    name  = "ingress.host"
+    value = var.ingress_host
   }
 
   depends_on = [
-    kubernetes_persistent_volume_claim.app_data,
-    kubernetes_persistent_volume_claim.redis_data
+    kubernetes_persistent_volume_claim.voice_app_uploads,
+    kubernetes_persistent_volume_claim.voice_app_output,
+    kubernetes_persistent_volume_claim.redis_master,
+    kubernetes_persistent_volume_claim.redis_replicas,
   ]
 }
 
 resource "google_compute_address" "voice_app" {
   name   = "voice-app-ip"
   region = var.region
-
-  lifecycle {
-    ignore_changes = [name]
-    prevent_destroy = true
-  }
 }
