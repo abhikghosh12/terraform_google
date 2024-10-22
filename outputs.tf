@@ -14,3 +14,8 @@ output "app_url" {
   value       = module.voice_app.app_url
   description = "URL to access the voice app"
 }
+
+output "ingress_ip" {
+  value       = module.voice_app.ingress_ip
+  description = "IP address of the ingress"
+}

@@ -6,6 +6,12 @@ variable "project_id" {
   default     = "voice-439010"
 }
 
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "europe-west4"
+}
+
 variable "cluster_name" {
   description = "Name of the GKE cluster"
   type        = string
@@ -24,6 +30,18 @@ variable "machine_type" {
   default     = "e2-medium"
 }
 
+variable "disk_size_gb" {
+  description = "Size of the disk attached to each node, specified in GB"
+  type        = number
+  default     = 25
+}
+
+variable "kubernetes_version" {
+  description = "The Kubernetes version for the cluster"
+  type        = string
+  default     = "1.31"
+}
+
 variable "namespace" {
   description = "Kubernetes namespace for the voice app"
   type        = string
@@ -36,26 +54,11 @@ variable "release_name" {
   default     = "voice-app"
 }
 
-variable "domain_name" {
-  description = "Domain name for the application"
-  type        = string
-  default     = "voicesapp.net"
-}
-
 variable "chart_path" {
   description = "Path to the Helm chart"
   type        = string
   default     = "./Charts/voice-app-0.1.0.tgz"
 }
-
-variable "region" {
-  description = "GCP region"
-  type        = string
-  default     = "europe-west4"
-
-}
-
-# variables.tf
 
 variable "webapp_image" {
   description = "Docker image for the webapp"
@@ -69,8 +72,8 @@ variable "worker_image" {
   default     = "docker.io/abhikgho/text_to_speech_web_app:worker-v1.0.3"
 }
 
-variable "disk_size_gb" {
-  description = "Size of the disk attached to each node, specified in GB"
-  type        = number
-  default     = 25  # Changed to 25GB
+variable "domain_name" {
+  description = "Domain name for the application"
+  type        = string
+  default     = "voicesapp.net"
 }

@@ -36,3 +36,8 @@ variable "disk_size_gb" {
   type        = number
   default     = 25
 }
+
+variable "kubernetes_version" {
+  description = "The Kubernetes version for the cluster"
+  type        = string
+}

@@ -48,6 +48,7 @@ variable "domain_name" {
 variable "google_client_access_token" {
   description = "Google client access token"
   type        = string
+  sensitive   = true
 }
 
 variable "cluster_endpoint" {
@@ -58,4 +59,5 @@ variable "cluster_endpoint" {
 variable "cluster_ca_certificate" {
   description = "GKE cluster CA certificate"
   type        = string
+  sensitive   = true
 }
