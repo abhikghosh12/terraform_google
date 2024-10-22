@@ -14,6 +14,11 @@ terraform {
       version = "~> 2.0"
     }
   }
+  backend "gcs" {
+    bucket = "terraform_state_files_voice"
+    prefix = "terraform/state"
+  }
+
 }
 
 provider "google" {
