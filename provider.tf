@@ -1,5 +1,3 @@
-# provider.tf
-
 terraform {
   required_version = ">= 0.14"
   required_providers {
@@ -16,11 +14,6 @@ terraform {
       version = "~> 2.0"
     }
   }
-
-  backend "gcs" {
-    bucket = "terraform_state_files_voice"
-    prefix = "terraform/state"
-  }
 }
 
 provider "google" {
@@ -28,17 +21,25 @@ provider "google" {
   region  = var.region
 }
 
+data "google_client_config" "default" {}
+
+data "google_container_cluster" "my_cluster" {
+  name     = var.cluster_name
+  location = var.region
+  project  = var.project_id
+}
+
 provider "kubernetes" {
-  host                   = module.gke.cluster_endpoint
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(module.gke.cluster_ca_certificate)
+  host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
+  token = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate)
 }
 
 provider "helm" {
   kubernetes {
-    host                   = module.gke.cluster_endpoint
-    token                  = data.google_client_config.default.access_token
-    cluster_ca_certificate = base64decode(module.gke.cluster_ca_certificate)
+    host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
+    token = data.google_client_config.default.access_token
+    cluster_ca_certificate = base64decode(data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate)
   }
 }
 
