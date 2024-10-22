@@ -84,4 +84,9 @@ variable "zones" {
   default     = ["europe-west1-b", "europe-west1-c", "europe-west1-d"]  # Multiple zones for availability
 }
 
-# ... rest of your existing variables ...
+
+variable "zone" {
+  description = "GCP zone"
+  type        = string
+  default     = "europe-west1-b"
+}

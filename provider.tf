@@ -1,3 +1,5 @@
+# provider.tf
+
 terraform {
   required_version = ">= 0.14"
   required_providers {
@@ -18,33 +20,37 @@ terraform {
     bucket = "terraform_state_files_voice"
     prefix = "terraform/state"
   }
-
 }
 
+# Google provider
 provider "google" {
   project = var.project_id
   region  = var.region
 }
 
+# Get Google credentials
 data "google_client_config" "default" {}
 
-data "google_container_cluster" "my_cluster" {
+# Get GKE cluster info
+data "google_container_cluster" "primary" {
   name     = var.cluster_name
-  location = var.region
+  location = "europe-west1-b"  # Specific zone where the cluster exists
   project  = var.project_id
 }
 
+# Kubernetes provider
 provider "kubernetes" {
-  host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
+  host  = "https://${data.google_container_cluster.primary.endpoint}"
   token = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate)
+  cluster_ca_certificate = base64decode(data.google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
 }
 
+# Helm provider
 provider "helm" {
   kubernetes {
-    host  = "https://${data.google_container_cluster.my_cluster.endpoint}"
+    host  = "https://${data.google_container_cluster.primary.endpoint}"
     token = data.google_client_config.default.access_token
-    cluster_ca_certificate = base64decode(data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate)
+    cluster_ca_certificate = base64decode(data.google_container_cluster.primary.master_auth[0].cluster_ca_certificate)
   }
 }
 
