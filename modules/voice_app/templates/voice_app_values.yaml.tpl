@@ -29,6 +29,9 @@ worker:
 ingress:
   enabled: ${ingress_enabled}
   host: ${ingress_host}
+  annotations:
+    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.global-static-ip-name: voice-app-ip
 
 service:
   type: ClusterIP
@@ -36,26 +39,32 @@ service:
 
 redis:
   enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
   master:
     persistence:
       enabled: true
       storageClass: standard
-      size: 5Gi
-  auth:
-    enabled: false
+      size: ${redis_storage_size}
   replica:
     persistence:
       enabled: true
       storageClass: standard
-      size: 5Gi
+      size: ${redis_storage_size}
     replicaCount: 2
 
 persistence:
   enabled: true
-  storageClass: standard
   uploads:
     enabled: true
-    size: 5Gi
+    storageClass: standard
+    size: ${uploads_storage_size}
+    accessModes:
+      - ReadWriteOnce
   output:
     enabled: true
-    size: 5Gi
+    storageClass: standard
+    size: ${output_storage_size}
+    accessModes:
+      - ReadWriteOnce

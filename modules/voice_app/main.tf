@@ -6,72 +6,9 @@ resource "kubernetes_namespace" "voice_app" {
   }
 }
 
-# PVC for uploads
-resource "kubernetes_persistent_volume_claim" "voice_app_uploads" {
-  metadata {
-    name      = "voice-app-uploads"
-    namespace = var.namespace
-  }
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard"
-    resources {
-      requests = {
-        storage = var.uploads_storage_size
-      }
-    }
-  }
-}
-
-# PVC for output
-resource "kubernetes_persistent_volume_claim" "voice_app_output" {
-  metadata {
-    name      = "voice-app-output"
-    namespace = var.namespace
-  }
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard"
-    resources {
-      requests = {
-        storage = var.output_storage_size
-      }
-    }
-  }
-}
-
-# PVC for Redis master
-resource "kubernetes_persistent_volume_claim" "redis_master" {
-  metadata {
-    name      = "redis-master"
-    namespace = var.namespace
-  }
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard"
-    resources {
-      requests = {
-        storage = var.redis_master_storage_size
-      }
-    }
-  }
-}
-
-# PVC for Redis replicas
-resource "kubernetes_persistent_volume_claim" "redis_replicas" {
-  metadata {
-    name      = "redis-replicas"
-    namespace = var.namespace
-  }
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard"
-    resources {
-      requests = {
-        storage = var.redis_replicas_storage_size
-      }
-    }
-  }
+resource "google_compute_address" "voice_app" {
+  name   = "voice-app-ip"
+  region = var.region
 }
 
 resource "helm_release" "voice_app" {
@@ -92,87 +29,13 @@ resource "helm_release" "voice_app" {
       worker_replica_count = var.worker_replica_count
       ingress_enabled      = var.ingress_enabled
       ingress_host         = var.ingress_host
+      uploads_storage_size = var.uploads_storage_size
+      output_storage_size  = var.output_storage_size
+      redis_storage_size   = var.redis_master_storage_size
     })
   ]
 
-  # Base configuration
-  set {
-    name  = "persistence.enabled"
-    value = "false"
-  }
-
-  # Storage configuration
-  set {
-    name  = "persistence.storageClass"
-    value = "standard"
-  }
-
-  set {
-    name  = "persistence.uploads.existingClaim"
-    value = kubernetes_persistent_volume_claim.voice_app_uploads.metadata[0].name
-  }
-
-  set {
-    name  = "persistence.output.existingClaim"
-    value = kubernetes_persistent_volume_claim.voice_app_output.metadata[0].name
-  }
-
-  # Redis configuration
-  set {
-    name  = "redis.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "redis.master.persistence.enabled"
-    value = "false"
-  }
-
-  set {
-    name  = "redis.master.persistence.existingClaim"
-    value = kubernetes_persistent_volume_claim.redis_master.metadata[0].name
-  }
-
-  set {
-    name  = "redis.replica.persistence.enabled"
-    value = "false"
-  }
-
-  set {
-    name  = "redis.replica.persistence.existingClaim"
-    value = kubernetes_persistent_volume_claim.redis_replicas.metadata[0].name
-  }
-
-  # Ingress configuration
-  set {
-    name  = "ingress.enabled"
-    value = var.ingress_enabled
-  }
-
-  set {
-    name  = "ingress.annotations.kubernetes\\.io/ingress\\.class"
-    value = "gce"
-  }
-
-  set {
-    name  = "ingress.annotations.kubernetes\\.io/ingress\\.global-static-ip-name"
-    value = google_compute_address.voice_app.name
-  }
-
-  set {
-    name  = "ingress.host"
-    value = var.ingress_host
-  }
-
   depends_on = [
-    kubernetes_persistent_volume_claim.voice_app_uploads,
-    kubernetes_persistent_volume_claim.voice_app_output,
-    kubernetes_persistent_volume_claim.redis_master,
-    kubernetes_persistent_volume_claim.redis_replicas,
+    kubernetes_namespace.voice_app
   ]
-}
-
-resource "google_compute_address" "voice_app" {
-  name   = "voice-app-ip"
-  region = var.region
 }
