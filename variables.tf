@@ -6,12 +6,6 @@ variable "project_id" {
   default     = "voice-439010"
 }
 
-variable "region" {
-  description = "GCP region"
-  type        = string
-  default     = "europe-west4"
-}
-
 variable "cluster_name" {
   description = "Name of the GKE cluster"
   type        = string
@@ -77,3 +71,17 @@ variable "domain_name" {
   type        = string
   default     = "voicesapp.net"
 }
+
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "europe-west1"  # Changed from europe-west4
+}
+
+variable "zones" {
+  description = "List of zones for the GKE cluster"
+  type        = list(string)
+  default     = ["europe-west1-b", "europe-west1-c", "europe-west1-d"]  # Multiple zones for availability
+}
+
+# ... rest of your existing variables ...

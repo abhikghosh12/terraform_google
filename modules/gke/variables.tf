@@ -1,5 +1,3 @@
-# modules/gke/variables.tf
-
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
@@ -8,6 +6,11 @@ variable "project_id" {
 variable "region" {
   description = "GCP region"
   type        = string
+}
+
+variable "zones" {
+  description = "List of zones for the GKE cluster"
+  type        = list(string)
 }
 
 variable "cluster_name" {
@@ -25,19 +28,14 @@ variable "machine_type" {
   type        = string
 }
 
-variable "create_cluster" {
-  description = "Whether to create the GKE cluster"
-  type        = bool
-  default     = true
-}
-
 variable "disk_size_gb" {
-  description = "Size of the disk attached to each node, specified in GB"
+  description = "Size of the disk attached to each node"
   type        = number
   default     = 25
 }
 
-variable "kubernetes_version" {
-  description = "The Kubernetes version for the cluster"
-  type        = string
+variable "create_cluster" {
+  description = "Whether to create the GKE cluster"
+  type        = bool
+  default     = true
 }
