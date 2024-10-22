@@ -28,9 +28,6 @@ provider "google" {
   region  = var.region
 }
 
-# Get Google credentials
-data "google_client_config" "default" {}
-
 # Get GKE cluster info
 data "google_container_cluster" "primary" {
   name     = var.cluster_name
