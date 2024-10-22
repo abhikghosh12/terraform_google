@@ -98,7 +98,7 @@ resource "helm_release" "voice_app" {
   # Base configuration
   set {
     name  = "persistence.enabled"
-    value = "true"
+    value = "false"
   }
 
   # Storage configuration
@@ -125,7 +125,7 @@ resource "helm_release" "voice_app" {
 
   set {
     name  = "redis.master.persistence.enabled"
-    value = "true"
+    value = "false"
   }
 
   set {
@@ -135,7 +135,7 @@ resource "helm_release" "voice_app" {
 
   set {
     name  = "redis.replica.persistence.enabled"
-    value = "true"
+    value = "false"
   }
 
   set {
