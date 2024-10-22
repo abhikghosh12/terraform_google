@@ -6,6 +6,24 @@ variable "project_id" {
   default     = "voice-439010"
 }
 
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "europe-west1"
+}
+
+variable "zones" {
+  description = "List of zones for the GKE cluster"
+  type        = list(string)
+  default     = ["europe-west1-b", "europe-west1-c", "europe-west1-d"]
+}
+
+variable "zone" {
+  description = "GCP zone"
+  type        = string
+  default     = "europe-west1-b"
+}
+
 variable "cluster_name" {
   description = "Name of the GKE cluster"
   type        = string
@@ -25,15 +43,15 @@ variable "machine_type" {
 }
 
 variable "disk_size_gb" {
-  description = "Size of the disk attached to each node, specified in GB"
+  description = "Size of the disk attached to each node"
   type        = number
   default     = 25
 }
 
-variable "kubernetes_version" {
-  description = "The Kubernetes version for the cluster"
+variable "chart_version" {
+  description = "Version of the Helm chart"
   type        = string
-  default     = "1.31"
+  default     = "0.1.0"
 }
 
 variable "namespace" {
@@ -66,27 +84,56 @@ variable "worker_image" {
   default     = "docker.io/abhikgho/text_to_speech_web_app:worker-v1.0.3"
 }
 
+variable "webapp_replica_count" {
+  description = "Number of replicas for the webapp"
+  type        = number
+  default     = 1
+}
+
+variable "worker_replica_count" {
+  description = "Number of replicas for the worker"
+  type        = number
+  default     = 1
+}
+
+variable "uploads_storage_size" {
+  description = "Storage size for uploads PVC"
+  type        = string
+  default     = "5Gi"
+}
+
+variable "output_storage_size" {
+  description = "Storage size for output PVC"
+  type        = string
+  default     = "5Gi"
+}
+
+variable "redis_master_storage_size" {
+  description = "Storage size for Redis master PVC"
+  type        = string
+  default     = "5Gi"
+}
+
+variable "redis_replicas_storage_size" {
+  description = "Storage size for Redis replicas PVC"
+  type        = string
+  default     = "5Gi"
+}
+
 variable "domain_name" {
   description = "Domain name for the application"
   type        = string
   default     = "voicesapp.net"
 }
 
-variable "region" {
-  description = "GCP region"
-  type        = string
-  default     = "europe-west1"  # Changed from europe-west4
+variable "ingress_enabled" {
+  description = "Whether to enable ingress"
+  type        = bool
+  default     = true
 }
 
-variable "zones" {
-  description = "List of zones for the GKE cluster"
-  type        = list(string)
-  default     = ["europe-west1-b", "europe-west1-c", "europe-west1-d"]  # Multiple zones for availability
-}
-
-
-variable "zone" {
-  description = "GCP zone"
-  type        = string
-  default     = "europe-west1-b"
+variable "create_ingress" {
+  description = "Whether to create a separate ingress resource"
+  type        = bool
+  default     = false
 }
