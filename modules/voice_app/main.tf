@@ -13,12 +13,16 @@ resource "kubernetes_persistent_volume_claim" "app_data" {
     namespace = kubernetes_namespace.voice_app.metadata[0].name
   }
   spec {
-    access_modes = ["ReadWriteOnce"]
+    access_modes = ["ReadWriteMany"]
     resources {
       requests = {
-        storage = "10Gi"
+        storage = "5Gi"
       }
     }
+  }
+  wait_until_bound = true
+  timeouts {
+    create = "10m"
   }
 }
 
@@ -28,28 +32,27 @@ resource "kubernetes_persistent_volume_claim" "redis_data" {
     namespace = kubernetes_namespace.voice_app.metadata[0].name
   }
   spec {
-    access_modes = ["ReadWriteOnce"]
+    access_modes = ["ReadWriteMany"]
     resources {
       requests = {
         storage = "5Gi"
       }
     }
   }
-}
-
-# Remove any existing ingress before Helm release
-resource "null_resource" "remove_existing_ingress" {
-  provisioner "local-exec" {
-    command = "kubectl delete ingress -n ${var.namespace} voice-app-ingress --ignore-not-found=true"
+  wait_until_bound = true
+  timeouts {
+    create = "10m"
   }
 }
 
 resource "helm_release" "voice_app" {
-  name       = var.release_name
-  chart      = var.chart_path
-  namespace  = kubernetes_namespace.voice_app.metadata[0].name
+  name          = var.release_name
+  chart         = var.chart_path
+  namespace     = kubernetes_namespace.voice_app.metadata[0].name
   force_update  = true
-  replace    = true
+  replace       = true
+  max_history   = 5
+  timeout       = 1200
 
   set {
     name  = "worker.image.repository"
@@ -113,8 +116,7 @@ resource "helm_release" "voice_app" {
 
   depends_on = [
     kubernetes_persistent_volume_claim.app_data,
-    kubernetes_persistent_volume_claim.redis_data,
-    null_resource.remove_existing_ingress
+    kubernetes_persistent_volume_claim.redis_data
   ]
 }
 
