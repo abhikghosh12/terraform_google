@@ -1,18 +1,14 @@
 webapp:
   image:
-    repository: abhikgho/text_to_speech_web_app
+    repository: docker.io/abhikgho/text_to_speech_web_app
     tag: web-v1.0.3
   replicaCount: 1
 
 worker:
   image:
-    repository: abhikgho/text_to_speech_web_app
+    repository: docker.io/abhikgho/text_to_speech_web_app
     tag: worker-v1.0.3
   replicaCount: 1
-
-ingress:
-  enabled: true
-  host: voicesapp.net
 
 service:
   type: ClusterIP
@@ -31,6 +27,7 @@ redis:
     persistence:
       enabled: true
       storageClass: standard
+      size: 8Gi
     replicaCount: 2
 
 persistence:

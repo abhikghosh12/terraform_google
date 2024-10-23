@@ -41,13 +41,33 @@ resource "helm_release" "voice_app" {
 
   # Storage configurations
   set {
+    name  = "persistence.uploads.enabled"
+    value = "true"
+  }
+
+  set {
     name  = "persistence.uploads.storageClass"
-    value = "standard"
+    value = "standard"  # Changed from standard-rwo
+  }
+
+  set {
+    name  = "persistence.uploads.size"
+    value = "5Gi"
+  }
+
+  set {
+    name  = "persistence.output.enabled"
+    value = "true"
   }
 
   set {
     name  = "persistence.output.storageClass"
-    value = "standard"
+    value = "standard"  # Changed from standard-rwo
+  }
+
+  set {
+    name  = "persistence.output.size"
+    value = "5Gi"
   }
 
   # Redis configurations
@@ -70,16 +90,6 @@ resource "helm_release" "voice_app" {
   set {
     name  = "ingress.host"
     value = var.ingress_host
-  }
-
-  set {
-    name  = "ingress.annotations.kubernetes\\.io/ingress\\.class"
-    value = "gce"
-  }
-
-  set {
-    name  = "ingress.annotations.kubernetes\\.io/ingress\\.global-static-ip-name"
-    value = google_compute_address.voice_app.name
   }
 
   depends_on = [
