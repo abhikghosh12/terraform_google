@@ -31,13 +31,13 @@ module "voice_app" {
   depends_on = [module.gke]
 }
 
-module "gcp_https" {
-  source = "./modules/gcp-https"
+# module "gcp_https" {
+#   source = "./modules/gcp-https"
 
-  project_id   = var.project_id
-  domain_name  = "voicesapp.net"
-  namespace    = "voiceapp"
-  static_ip    = "34.160.180.252"
-  service_name = "voice-app-webapp"
-  service_port = 80
-}
+#   project_id   = var.project_id
+#   domain_name  = "voicesapp.net"
+#   namespace    = "voiceapp"
+#   static_ip    = "34.160.180.252"
+#   service_name = "voice-app-webapp"
+#   service_port = 80
+# }
