@@ -20,7 +20,6 @@ output "ingress_ip" {
   description = "IP address of the ingress"
 }
 
-outputs.tf
 output "certificate_name" {
   description = "GCP managed certificate name"
   value       = module.gcp_https.certificate_name
