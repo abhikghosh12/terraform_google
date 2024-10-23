@@ -37,6 +37,8 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
+    - name: Terraform lock
+      run: terraform apply -lock=false -auto-approve
 
     # - name: Import Existing GKE Cluster
     #   run: |
@@ -45,12 +47,12 @@ jobs:
     #     terraform import module.voice_app.google_compute_address.voice_app projects/voice-439010/regions/europe-west4/addresses/voice-app-ip
     #   continue-on-error: true
 
-    - name: Terraform Plan
-      run: terraform plan -no-color -out=tfplan -lock=false
+    # - name: Terraform Plan
+    #   run: terraform plan -no-color -out=tfplan -lock=false
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve tfplan -lock=false
+    # - name: Terraform Apply
+    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #   run: terraform apply -auto-approve tfplan -lock=false
 
     # - name: Terraform Destroy
     #   run: |
