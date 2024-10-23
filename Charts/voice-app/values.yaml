@@ -1,19 +1,57 @@
+# values.yaml
+
+# Web Application Configuration
 webapp:
   image:
     repository: docker.io/abhikgho/text_to_speech_web_app
     tag: web-v1.0.3
   replicaCount: 1
 
+# Worker Configuration
 worker:
   image:
     repository: docker.io/abhikgho/text_to_speech_web_app
     tag: worker-v1.0.3
   replicaCount: 1
 
+# Service Configuration
 service:
   type: ClusterIP
   port: 5000
+  name: voice-app-webapp
 
+# Ingress Configuration
+ingress:
+  enabled: true
+  className: "gce"
+  staticIp: "voice-app-static-ip"
+  allowHttp: "true"
+  
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "voice-app-static-ip"
+    networking.gke.io/managed-certificates: "voice-app-cert"
+    networking.gke.io/v1beta1.FrontendConfig: "voice-app-frontend-config"
+
+  hosts:
+    - host: voicesapp.net
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: www.voicesapp.net
+      paths:
+        - path: /
+          pathType: Prefix
+
+  ssl:
+    enabled: true
+    certName: "voice-app-cert"
+    redirectToHttps: true
+    redirectResponseCode: "MOVED_PERMANENTLY_DEFAULT"
+
+  frontendConfig:
+    name: "voice-app-frontend-config"
+
+# Redis Configuration
 redis:
   enabled: true
   master:
@@ -30,16 +68,17 @@ redis:
       size: 8Gi
     replicaCount: 2
 
+# Persistence Configuration
 persistence:
   uploads:
     enabled: true
-    name: voice-app-uploads  # Added explicit name
+    name: voice-app-uploads
     size: 5Gi
     storageClass: standard
     accessMode: ReadWriteOnce
   output:
     enabled: true
-    name: voice-app-output   # Added explicit name
+    name: voice-app-output
     size: 5Gi
     storageClass: standard
     accessMode: ReadWriteOnce

@@ -1,23 +1,54 @@
+# templates/ingress.yaml
+{{- if .Values.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: voice-app-ingress
+  name: {{ include "voice-app.fullname" . }}-ingress
   labels:
-    app: voice-app
-    app.kubernetes.io/instance: voice-app
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: voice-app
-    app.kubernetes.io/version: "1.0.1"
-    helm.sh/chart: voice-app-0.1.0
+    {{- include "voice-app.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.staticIp }}
+    networking.gke.io/managed-certificates: {{ .Values.ingress.ssl.certName }}
+    networking.gke.io/v1beta1.FrontendConfig: {{ .Values.ingress.frontendConfig.name }}
+    kubernetes.io/ingress.allow-http: {{ .Values.ingress.allowHttp | quote }}
 spec:
+  ingressClassName: {{ .Values.ingress.className }}
   rules:
-    - host: "voicesapp.net"
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
       http:
         paths:
-          - path: /
-            pathType: Prefix
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
             backend:
               service:
-                name: voice-app-webapp
+                name: {{ $.Values.service.name }}
                 port:
-                  number: 80
+                  number: {{ $.Values.service.port }}
+          {{- end }}
+    {{- end }}
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: {{ .Values.ingress.ssl.certName }}
+  labels:
+    {{- include "voice-app.labels" . | nindent 4 }}
+spec:
+  domains:
+  {{- range .Values.ingress.hosts }}
+    - {{ .host }}
+  {{- end }}
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: {{ .Values.ingress.frontendConfig.name }}
+  labels:
+    {{- include "voice-app.labels" . | nindent 4 }}
+spec:
+  redirectToHttps:
+    enabled: {{ .Values.ingress.ssl.redirectToHttps }}
+    responseCodeName: {{ .Values.ingress.ssl.redirectResponseCode }}
+{{- end }}
