@@ -1,5 +1,3 @@
-# main.tf
-
 data "google_client_config" "default" {}
 
 module "gke" {
@@ -24,8 +22,8 @@ module "voice_app" {
   webapp_image              = var.webapp_image
   worker_image              = var.worker_image
   domain_name               = var.domain_name
-  ingress_host             = var.ingress_host
-  ingress_enabled          = var.ingress_enabled
+  ingress_host             = var.domain_name
+  ingress_enabled          = true
   google_client_access_token = data.google_client_config.default.access_token
   cluster_endpoint          = module.gke.cluster_endpoint
   cluster_ca_certificate    = module.gke.cluster_ca_certificate

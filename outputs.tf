@@ -11,7 +11,7 @@ output "cluster_endpoint" {
 }
 
 output "app_url" {
-  value       = module.voice_app.app_url
+  value       = "https://${var.domain_name}"
   description = "URL to access the voice app"
 }
 

@@ -18,7 +18,6 @@ terraform {
   backend "gcs" {
     bucket = "terraform_state_files_voice"
     prefix = "terraform/state"
-
   }
 }
 
@@ -28,16 +27,15 @@ provider "google" {
 }
 
 provider "kubernetes" {
-  host                   = module.gke.cluster_endpoint
-  token                  = data.google_client_config.default.access_token
+  host  = "https://${module.gke.cluster_endpoint}"
+  token = data.google_client_config.default.access_token
   cluster_ca_certificate = base64decode(module.gke.cluster_ca_certificate)
 }
 
 provider "helm" {
   kubernetes {
-    host                   = module.gke.cluster_endpoint
-    token                  = data.google_client_config.default.access_token
+    host  = "https://${module.gke.cluster_endpoint}"
+    token = data.google_client_config.default.access_token
     cluster_ca_certificate = base64decode(module.gke.cluster_ca_certificate)
   }
 }
-
