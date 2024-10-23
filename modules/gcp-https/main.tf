@@ -34,20 +34,6 @@ variable "service_port" {
   default     = 80
 }
 
-# modules/gcp-https/main.tf
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 5.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.0"
-    }
-  }
-}
-
 # Create GCP Managed Certificate
 resource "kubernetes_manifest" "managed_certificate" {
   manifest = {
