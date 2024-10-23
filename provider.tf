@@ -18,9 +18,6 @@ terraform {
   backend "gcs" {
     bucket = "terraform_state_files_voice"
     prefix = "terraform/state"
-    # Add these lock settings
-    enable_lock = true
-    lock_timeout_seconds = 300  # 5 minute
 
   }
 }
