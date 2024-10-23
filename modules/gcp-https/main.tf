@@ -35,6 +35,9 @@ variable "service_port" {
 }
 
 # Create GCP Managed Certificate
+# modules/gcp-https/main.tf
+
+# Create GCP Managed Certificate
 resource "kubernetes_manifest" "managed_certificate" {
   manifest = {
     apiVersion = "networking.gke.io/v1"
@@ -70,57 +73,87 @@ resource "kubernetes_manifest" "frontend_config" {
   }
 }
 
-# Update Ingress for HTTPS
-resource "kubernetes_ingress_v1" "https_ingress" {
-  metadata {
-    name      = "voice-app-ingress"
-    namespace = var.namespace
-    annotations = {
-      "kubernetes.io/ingress.class"                 = "gce"
-      "kubernetes.io/ingress.global-static-ip-name" = var.static_ip
-      "networking.gke.io/managed-certificates"      = kubernetes_manifest.managed_certificate.manifest.metadata.name
-      "kubernetes.io/ingress.allow-http"           = "false"
-      "networking.gke.io/v1beta1.FrontendConfig"   = kubernetes_manifest.frontend_config.manifest.metadata.name
+# Patch existing Ingress for HTTPS
+resource "kubernetes_manifest" "ingress_patch" {
+  manifest = {
+    apiVersion = "networking.k8s.io/v1"
+    kind       = "Ingress"
+    metadata = {
+      name      = "voice-app-ingress"
+      namespace = var.namespace
+      annotations = {
+        "kubernetes.io/ingress.class"                 = "gce"
+        "kubernetes.io/ingress.global-static-ip-name" = var.static_ip
+        "networking.gke.io/managed-certificates"      = kubernetes_manifest.managed_certificate.manifest.metadata.name
+        "kubernetes.io/ingress.allow-http"           = "false"
+        "networking.gke.io/v1beta1.FrontendConfig"   = kubernetes_manifest.frontend_config.manifest.metadata.name
+      }
+    }
+    spec = {
+      rules = [
+        {
+          host = var.domain_name
+          http = {
+            paths = [
+              {
+                path      = "/"
+                pathType  = "Prefix"
+                backend = {
+                  service = {
+                    name = var.service_name
+                    port = {
+                      number = var.service_port
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          host = "www.${var.domain_name}"
+          http = {
+            paths = [
+              {
+                path      = "/"
+                pathType  = "Prefix"
+                backend = {
+                  service = {
+                    name = var.service_name
+                    port = {
+                      number = var.service_port
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
     }
   }
 
-  spec {
-    rule {
-      host = var.domain_name
-      http {
-        path {
-          path      = "/"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = var.service_name
-              port {
-                number = var.service_port
-              }
-            }
-          }
-        }
-      }
-    }
-
-    rule {
-      host = "www.${var.domain_name}"
-      http {
-        path {
-          path      = "/"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = var.service_name
-              port {
-                number = var.service_port
-              }
-            }
-          }
-        }
-      }
-    }
+  field_manager {
+    # Force field manager conflicts to be overwritten
+    force_conflicts = true
   }
+}
+
+# Additional locals for kubectl commands if needed
+locals {
+  kubectl_patch_ingress = <<-EOT
+    kubectl patch ingress voice-app-ingress -n ${var.namespace} --type=merge -p '{
+      "metadata": {
+        "annotations": {
+          "kubernetes.io/ingress.class": "gce",
+          "kubernetes.io/ingress.global-static-ip-name": "${var.static_ip}",
+          "networking.gke.io/managed-certificates": "${kubernetes_manifest.managed_certificate.manifest.metadata.name}",
+          "kubernetes.io/ingress.allow-http": "false",
+          "networking.gke.io/v1beta1.FrontendConfig": "${kubernetes_manifest.frontend_config.manifest.metadata.name}"
+        }
+      }
+    }'
+  EOT
 }
 
 # modules/gcp-https/outputs.tf
@@ -130,6 +163,11 @@ output "certificate_name" {
 }
 
 output "ingress_name" {
-  description = "Name of the created ingress"
-  value       = kubernetes_ingress_v1.https_ingress.metadata[0].name
+  description = "Name of the patched ingress"
+  value       = kubernetes_manifest.ingress_patch.manifest.metadata.name
+}
+
+output "kubectl_patch_command" {
+  description = "kubectl command to patch ingress (if needed)"
+  value       = local.kubectl_patch_ingress
 }
