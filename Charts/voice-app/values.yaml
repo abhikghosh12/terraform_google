@@ -33,11 +33,13 @@ redis:
 persistence:
   uploads:
     enabled: true
+    name: voice-app-uploads  # Added explicit name
     size: 5Gi
     storageClass: standard
     accessMode: ReadWriteOnce
   output:
     enabled: true
+    name: voice-app-output   # Added explicit name
     size: 5Gi
     storageClass: standard
     accessMode: ReadWriteOnce
