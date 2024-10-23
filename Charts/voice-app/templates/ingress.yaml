@@ -11,7 +11,7 @@ metadata:
     helm.sh/chart: voice-app-0.1.0
 spec:
   rules:
-    - host: "voice.app.com"
+    - host: "voicesapp.net"
       http:
         paths:
           - path: /
