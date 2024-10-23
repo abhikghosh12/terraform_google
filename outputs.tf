@@ -20,12 +20,12 @@ output "ingress_ip" {
   description = "IP address of the ingress"
 }
 
-output "certificate_name" {
-  description = "GCP managed certificate name"
-  value       = module.gcp_https.certificate_name
-}
+# output "certificate_name" {
+#   description = "GCP managed certificate name"
+#   value       = module.gcp_https.certificate_name
+# }
 
-output "ingress_name" {
-  description = "Ingress resource name"
-  value       = module.gcp_https.ingress_name
-}
+# output "ingress_name" {
+#   description = "Ingress resource name"
+#   value       = module.gcp_https.ingress_name
+# }
