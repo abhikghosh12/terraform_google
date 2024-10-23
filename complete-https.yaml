@@ -1,0 +1,63 @@
+# complete-https.yaml
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: voice-app-frontend-config
+  namespace: voiceapp
+  labels:
+    app: voice-app
+    app.kubernetes.io/instance: voice-app
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: voice-app-cert
+  namespace: voiceapp
+  labels:
+    app: voice-app
+    app.kubernetes.io/instance: voice-app
+spec:
+  domains:
+  - voicesapp.net
+  - www.voicesapp.net
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: voice-app-ingress
+  namespace: voiceapp
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "voice-app-static-ip"
+    networking.gke.io/managed-certificates: "voice-app-cert"
+    networking.gke.io/v1beta1.FrontendConfig: "voice-app-frontend-config"
+    kubernetes.io/ingress.allow-http: "true"
+  labels:
+    app: voice-app
+    app.kubernetes.io/instance: voice-app
+spec:
+  ingressClassName: "gce"  # Using proper field instead of annotation
+  rules:
+  - host: voicesapp.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: voice-app-webapp
+            port:
+              number: 80
+  - host: www.voicesapp.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: voice-app-webapp
+            port:
+              number: 80
