@@ -15,18 +15,18 @@ output "app_url" {
   description = "URL to access the voice app"
 }
 
-output "ingress_ip" {
-  value       = module.voice_app.ingress_ip
-  description = "IP address of the ingress"
-}
+# output "ingress_ip" {
+#   value       = module.voice_app.ingress_ip
+#   description = "IP address of the ingress"
+# }
 
 # outputs.tf
-output "certificate_name" {
-  description = "GCP managed certificate name"
-  value       = module.gcp_https.certificate_name
-}
+# output "certificate_name" {
+#   description = "GCP managed certificate name"
+#   value       = module.gcp_https.certificate_name
+# }
 
-output "ingress_name" {
-  description = "Ingress resource name"
-  value       = module.gcp_https.ingress_name
-}
+# output "ingress_name" {
+#   description = "Ingress resource name"
+#   value       = module.gcp_https.ingress_name
+# }
