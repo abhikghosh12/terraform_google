@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "voice-app.fullname" . }}-webapp
+  labels:
+    {{- include "voice-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: webapp
+spec:
+  replicas: {{ .Values.webapp.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "voice-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: webapp
+  template:
+    metadata:
+      labels:
+        {{- include "voice-app.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: webapp
+    spec:
+      containers:
+        - name: webapp
+          image: "{{ .Values.webapp.image.repository }}:{{ .Values.webapp.image.tag }}"
+          imagePullPolicy: Always
+          command: ["node", "server.js"]
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: REDIS_URL
+              value: redis://{{ .Release.Name }}-redis-master:6379
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+            - name: output
+              mountPath: /app/output
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-voice-app-uploads
+        - name: output
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-voice-app-output

@@ -137,3 +137,9 @@ variable "create_ingress" {
   type        = bool
   default     = false
 }
+
+variable "ingress_host" {
+  description = "Hostname for the ingress"
+  type        = string
+  default     = "voicesapp.net"  # Same as domain_name
+}

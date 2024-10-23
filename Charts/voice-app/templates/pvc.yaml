@@ -1,0 +1,29 @@
+{{- if .Values.persistence.uploads.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-uploads
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.persistence.uploads.size }}
+      storageClassName: {{ .Values.persistence.uploads.storageClassName }}      
+{{- end }}
+
+---
+
+{{- if .Values.persistence.output.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-output
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.persistence.output.size }}
+      storageClassName: {{ .Values.persistence.output.storageClassName }}
+{{- end }}

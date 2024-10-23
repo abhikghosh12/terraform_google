@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: voice-app-configmap  # Replace 'voice-app' with your actual release name
+  labels:
+    app: voice-app           # Adjust labels as needed
+data:
+  REDIS_HOST: voice-app-redis-master  # Use the actual Redis service name
+  REDIS_PORT: "6379"

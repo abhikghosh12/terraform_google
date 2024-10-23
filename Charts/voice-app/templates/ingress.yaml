@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: voice-app-ingress
+  labels:
+    app: voice-app
+    app.kubernetes.io/instance: voice-app
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: voice-app
+    app.kubernetes.io/version: "1.0.1"
+    helm.sh/chart: voice-app-0.1.0
+spec:
+  rules:
+    - host: "voice.app.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: voice-app-webapp
+                port:
+                  number: 80
