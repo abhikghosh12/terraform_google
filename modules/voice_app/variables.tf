@@ -72,8 +72,3 @@ variable "ingress_enabled" {
   type        = bool
   default     = true
 }
-
-variable "domain_name" {
-  description = "Domain name for the application"
-  type        = string
-}
