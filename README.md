@@ -41,9 +41,9 @@ The infrastructure consists of:
 ## Connect & Contribute
 
 - 🌟 Star this repository if you find it helpful
-- 🔗 Follow on [LinkedIn](https://linkedin.com/in/yourusername) for updates
-- 💬 Join our [Discord Community](https://discord.gg/yourinvite)
-- 📝 Check out my [Blog Posts](https://yourblog.com)
+- 🔗 Follow on [LinkedIn](https://www.linkedin.com/in/abhik-ghosh-msc/) for updates
+- 💬 Join our [My website](https://abhikghosh87.wixsite.com/website)
+- 📝 Check out my [Blog Posts](https://medium.com/@abhikghosh_46536)
 
 ## Support the Project
 
