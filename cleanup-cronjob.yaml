@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: voice-app-cleanup
+  namespace: voiceapp
+spec:
+  schedule: "0 0 * * *"  # Run at midnight every day
+  successfulJobsHistoryLimit: 1  # Keep only last successful job history
+  failedJobsHistoryLimit: 1      # Keep only last failed job history
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cleanup
+            image: busybox:stable
+            command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Starting cleanup at $(date)"
+              echo "Cleaning uploads directory..."
+              find /app/uploads -type f -mtime +1 -delete
+              echo "Cleaning output directory..."
+              find /app/output -type f -mtime +1 -delete
+              echo "Cleanup completed at $(date)"
+            volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+            - name: output
+              mountPath: /app/output
+            resources:
+              requests:
+                memory: "64Mi"
+                cpu: "50m"
+              limits:
+                memory: "128Mi"
+                cpu: "100m"
+          restartPolicy: OnFailure
+          volumes:
+          - name: uploads
+            persistentVolumeClaim:
+              claimName: voice-app-uploads
+          - name: output
+            persistentVolumeClaim:
+              claimName: voice-app-output
