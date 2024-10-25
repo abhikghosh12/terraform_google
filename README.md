@@ -194,9 +194,6 @@ If you find this project helpful, consider supporting its development:
 - ⭐ Star this repository
 - 📣 Share with others
 
----
-Made with ❤️ by the community. Special thanks to all our supporters!
-
 ### Technical Support
 For technical questions and issues:
 - Open an issue in the repository
